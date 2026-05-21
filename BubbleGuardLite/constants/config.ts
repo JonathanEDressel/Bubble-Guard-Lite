@@ -1,6 +1,6 @@
 export const GROW_INTERVAL_MS = 5000;
 export const POP_INTERVAL_MS = 2000;
-export const BUBBLE_RADIUS = 28;
+export const BUBBLE_RADIUS = 55;
 export const BANNER_HEIGHT = 60;
 
 export const BUBBLE_PALETTE = [

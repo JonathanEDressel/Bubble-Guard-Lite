@@ -12,35 +12,43 @@ function randomColor(): string {
 
 function findBubblePosition(
   existing: Bubble[],
-  radius: number
+  radius: number,
+  canvasW: number,
+  canvasH: number
 ): { cx: number; cy: number } {
-  if (existing.length === 0) return { cx: 0, cy: 0 };
+  if (existing.length === 0) return { cx: canvasW / 2, cy: canvasH / 2 };
 
-  const STEP = (15 * Math.PI) / 180; // 15 degrees in radians
-  const MAX_ATTEMPTS = 360 / 15;
+  const STEP = (15 * Math.PI) / 180;
+  const ANGLES = 24; // 360° / 15°
+  const margin = 2;
 
-  for (let i = 0; i < MAX_ATTEMPTS; i++) {
+  const inBounds = (cx: number, cy: number) =>
+    cx >= radius + margin &&
+    cx <= canvasW - radius - margin &&
+    cy >= radius + margin &&
+    cy <= canvasH - radius - margin;
+
+  const noOverlap = (cx: number, cy: number) =>
+    !existing.some(
+      (b) => Math.sqrt((b.cx - cx) ** 2 + (b.cy - cy) ** 2) < b.radius + radius - 0.5
+    );
+
+  // Try every anchor × every angle — pick first that fits on screen with no overlap
+  for (let i = 0; i < ANGLES; i++) {
     const angle = i * STEP;
-    // Pick nearest bubble as anchor
-    const anchor = existing[Math.floor(Math.random() * existing.length)];
-    const dist = anchor.radius + radius;
-    const cx = anchor.cx + Math.cos(angle) * dist;
-    const cy = anchor.cy + Math.sin(angle) * dist;
-
-    // Check overlap with all other bubbles
-    const overlaps = existing.some((b) => {
-      const d = Math.sqrt((b.cx - cx) ** 2 + (b.cy - cy) ** 2);
-      return d < b.radius + radius - 0.5;
-    });
-
-    if (!overlaps) return { cx, cy };
+    for (const anchor of existing) {
+      const dist = anchor.radius + radius;
+      const cx = anchor.cx + Math.cos(angle) * dist;
+      const cy = anchor.cy + Math.sin(angle) * dist;
+      if (inBounds(cx, cy) && noOverlap(cx, cy)) return { cx, cy };
+    }
   }
 
-  // Fallback: place adjacent to the last bubble
+  // Fallback: clamp to nearest valid position inside the canvas
   const last = existing[existing.length - 1];
   return {
-    cx: last.cx + (last.radius + radius) * Math.cos(0),
-    cy: last.cy + (last.radius + radius) * Math.sin(0),
+    cx: Math.max(radius + margin, Math.min(canvasW - radius - margin, last.cx + last.radius + radius)),
+    cy: Math.max(radius + margin, Math.min(canvasH - radius - margin, last.cy)),
   };
 }
 
@@ -50,6 +58,8 @@ function findBubblePosition(
 interface UseBubbleEngineOptions {
   canvasCx: number;
   canvasCy: number;
+  canvasW: number;
+  canvasH: number;
   onSessionEnd: (peakCount: number, sessionDurationMs: number) => void;
   onSpawn?: () => void;
   onPop?: () => void;
@@ -58,6 +68,8 @@ interface UseBubbleEngineOptions {
 export function useBubbleEngine({
   canvasCx,
   canvasCy,
+  canvasW,
+  canvasH,
   onSessionEnd,
   onSpawn,
   onPop,
@@ -116,7 +128,7 @@ export function useBubbleEngine({
       clearPop();
       growRef.current = setInterval(() => {
         const current = getBubbles();
-        const pos = findBubblePosition(current, BUBBLE_RADIUS);
+        const pos = findBubblePosition(current, BUBBLE_RADIUS, canvasW, canvasH);
         addBubble({ ...pos, radius: BUBBLE_RADIUS, color: randomColor() });
         onSpawn?.();
       }, GROW_INTERVAL_MS);

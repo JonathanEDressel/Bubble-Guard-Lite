@@ -16,7 +16,7 @@ export default function TabLayout() {
           title: 'Bubbles',
           tabBarIcon: ({ color }) => (
             <SymbolView
-              name={{ ios: 'circle.hexagongrid.fill', android: 'apps', web: 'apps' }}
+              name="circle.hexagongrid.fill"
               tintColor={color}
               size={26}
             />
@@ -29,7 +29,7 @@ export default function TabLayout() {
           title: 'Stats',
           tabBarIcon: ({ color }) => (
             <SymbolView
-              name={{ ios: 'chart.bar.fill', android: 'bar_chart', web: 'bar_chart' }}
+              name="chart.bar.fill"
               tintColor={color}
               size={26}
             />

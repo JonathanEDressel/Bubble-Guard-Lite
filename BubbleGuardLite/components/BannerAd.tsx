@@ -15,7 +15,7 @@ import { BANNER_HEIGHT } from '@/constants/config';
 export function BannerAd() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Ad Banner</Text>
+      <Text style={styles.text}>Advertisement</Text>
     </View>
   );
 }
@@ -23,14 +23,14 @@ export function BannerAd() {
 const styles = StyleSheet.create({
   container: {
     height: BANNER_HEIGHT,
-    backgroundColor: '#e8e8e8',
+    backgroundColor: '#12122a',
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#2a2a4a',
   },
   text: {
-    color: '#aaa',
+    color: 'rgba(255,255,255,0.35)',
     fontSize: 12,
   },
 });

@@ -13,11 +13,11 @@ export function useSound() {
 
       const [grow, pop] = await Promise.all([
         Audio.Sound.createAsync(
-          require('@/assets/sounds/bubble_grow.mp3'),
+          require('@/assets/sounds/bubble_grow.wav'),
           { shouldPlay: false }
         ),
         Audio.Sound.createAsync(
-          require('@/assets/sounds/bubble_pop.mp3'),
+          require('@/assets/sounds/bubble_pop.wav'),
           { shouldPlay: false }
         ),
       ]);

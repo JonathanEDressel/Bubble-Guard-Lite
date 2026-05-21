@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { StyleSheet, TouchableOpacity, Text, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 
@@ -15,8 +15,10 @@ export default function BubbleScreen() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
-  const canvasCx = width / 2;
-  const canvasCy = (height - insets.top - insets.bottom - BANNER_HEIGHT - 49) / 2;
+  const canvasW = width;
+  const canvasH = height - insets.top - insets.bottom - BANNER_HEIGHT - 49;
+  const canvasCx = canvasW / 2;
+  const canvasCy = canvasH / 2;
 
   const { writeSessionEnd } = useBestScore();
   const { playGrow, playPop } = useSound();
@@ -41,6 +43,8 @@ export default function BubbleScreen() {
   const { resetManual } = useBubbleEngine({
     canvasCx,
     canvasCy,
+    canvasW,
+    canvasH,
     onSessionEnd: handleSessionEnd,
     onSpawn: handleSpawn,
     onPop: handlePop,
@@ -54,13 +58,6 @@ export default function BubbleScreen() {
       <View style={styles.canvas}>
         <BubbleCanvas />
         <BubbleCount />
-        <TouchableOpacity
-          style={styles.resetBtn}
-          onPress={resetManual}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.resetText}>Reset</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -69,23 +66,9 @@ export default function BubbleScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#f5f9ff',
+    backgroundColor: '#0a0a1a',
   },
   canvas: {
     flex: 1,
-  },
-  resetBtn: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  resetText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
   },
 });

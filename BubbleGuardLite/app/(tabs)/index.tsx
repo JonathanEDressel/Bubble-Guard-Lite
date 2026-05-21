@@ -43,8 +43,6 @@ export default function BubbleScreen() {
   const { resetManual } = useBubbleEngine({
     canvasCx,
     canvasCy,
-    canvasW,
-    canvasH,
     onSessionEnd: handleSessionEnd,
     onSpawn: handleSpawn,
     onPop: handlePop,

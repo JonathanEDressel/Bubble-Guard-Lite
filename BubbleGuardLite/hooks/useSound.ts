@@ -9,7 +9,13 @@ export function useSound() {
     let mounted = true;
 
     async function load() {
-      await Audio.setAudioModeAsync({ playsInSilentModeIOS: false });
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,   // play even when the iOS silent switch is on
+        staysActiveInBackground: false,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
 
       const [grow, pop] = await Promise.all([
         Audio.Sound.createAsync(
@@ -31,8 +37,8 @@ export function useSound() {
       }
     }
 
-    load().catch(() => {
-      // Sound files not yet present; fail silently so the app still runs
+    load().catch((e) => {
+      console.error('[useSound] Failed to load audio:', e);
     });
 
     return () => {

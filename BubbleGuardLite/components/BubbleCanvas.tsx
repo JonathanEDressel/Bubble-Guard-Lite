@@ -1,10 +1,28 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useWindowDimensions } from 'react-native';
 import Svg, { Defs, RadialGradient, LinearGradient, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BANNER_HEIGHT } from '@/constants/config';
+import { BANNER_HEIGHT, BUBBLE_RADIUS } from '@/constants/config';
 import { useBubbleStore } from '@/store/useBubbleStore';
 import { BubbleNode } from './BubbleNode';
+
+const VIEWPORT_PAD = BUBBLE_RADIUS * 1.5;
+
+function computeViewBox(
+  bubbles: ReturnType<typeof useBubbleStore.getState>['bubbles'],
+  canvasW: number,
+  canvasH: number
+): string {
+  if (bubbles.length === 0) return `0 0 ${canvasW} ${canvasH}`;
+  const r = BUBBLE_RADIUS;
+  const xs = bubbles.map((b) => b.cx);
+  const ys = bubbles.map((b) => b.cy);
+  const minX = Math.min(0, Math.min(...xs) - r - VIEWPORT_PAD);
+  const minY = Math.min(0, Math.min(...ys) - r - VIEWPORT_PAD);
+  const maxX = Math.max(canvasW, Math.max(...xs) + r + VIEWPORT_PAD);
+  const maxY = Math.max(canvasH, Math.max(...ys) + r + VIEWPORT_PAD);
+  return `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+}
 
 export function BubbleCanvas() {
   const { width, height } = useWindowDimensions();
@@ -14,11 +32,17 @@ export function BubbleCanvas() {
   const canvasHeight =
     height - insets.top - insets.bottom - BANNER_HEIGHT - 49;
 
+  const viewBox = useMemo(
+    () => computeViewBox(bubbles, width, canvasHeight),
+    [bubbles, width, canvasHeight]
+  );
+
   return (
     <Svg
       width={width}
       height={canvasHeight}
-      viewBox={`0 0 ${width} ${canvasHeight}`}
+      viewBox={viewBox}
+      preserveAspectRatio="xMidYMid meet"
     >
       <Defs>
         {/*

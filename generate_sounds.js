@@ -37,71 +37,57 @@ function writeWav(filename, samples) {
 }
 
 // ---------------------------------------------------------------------------
-// bubble_grow  — gentle rising whistle (200 Hz → 700 Hz over 0.45 s)
-//               with soft fade-in and fade-out
+// bubble_grow  — soft ascending "blip" of a bubble forming underwater
+//               Frequency rises 120 Hz → 280 Hz (small bubble = higher pitch)
 // ---------------------------------------------------------------------------
 function generateGrow() {
-  const duration   = 0.45;
+  const duration   = 0.22;
   const numSamples = Math.floor(SAMPLE_RATE * duration);
   const samples    = [];
   let   phase      = 0;
 
   for (let i = 0; i < numSamples; i++) {
-    const progress = i / numSamples;
+    const t = i / SAMPLE_RATE;
 
-    // Smooth frequency sweep
-    const freq = 200 + 500 * (progress * progress);
+    // Ascending chirp: frequency rises as the bubble detaches and shrinks
+    const freq = 230 - 160 * Math.exp(-t * 25);
 
-    // Amplitude envelope: quick fade-in, long sustain, short fade-out
-    let amp;
-    if      (progress < 0.08) amp = progress / 0.08;
-    else if (progress > 0.85) amp = (1 - progress) / 0.15;
-    else                       amp = 1.0;
+    // 5 ms soft attack, then exponential decay
+    const amp = Math.min(1.0, t / 0.005) * Math.exp(-t * 11);
 
-    // Integrate phase to avoid discontinuities
+    // Nearly pure sine — water damps harmonics, giving bubbles a clean tone
     phase += (2 * Math.PI * freq) / SAMPLE_RATE;
+    const s = Math.sin(phase) * 0.90 + Math.sin(2 * phase) * 0.10;
 
-    const s =
-      Math.sin(phase) * 0.65 +
-      Math.sin(2 * phase) * 0.20 +
-      Math.sin(3 * phase) * 0.08;
-
-    samples.push(amp * s * 22000);
+    samples.push(amp * s * 24000);
   }
   return samples;
 }
 
 // ---------------------------------------------------------------------------
-// bubble_pop  — sharp low-frequency thump + decaying noise burst (0.18 s)
+// bubble_pop  — descending "bloop" of a bubble popping at the surface
+//               Frequency drops 350 Hz → 60 Hz (Minnaert resonance chirp)
 // ---------------------------------------------------------------------------
-// Seeded LCG so the noise is deterministic across runs
-let _seed = 0x1337BEEF;
-function rand() {
-  _seed = (_seed ^ (_seed << 13)) >>> 0;
-  _seed = (_seed ^ (_seed >> 17)) >>> 0;
-  _seed = (_seed ^ (_seed << 5))  >>> 0;
-  return (_seed / 0xFFFFFFFF) * 2 - 1; // [-1, 1]
-}
-
 function generatePop() {
-  const duration   = 0.18;
+  const duration   = 0.28;
   const numSamples = Math.floor(SAMPLE_RATE * duration);
   const samples    = [];
+  let   phase      = 0;
 
   for (let i = 0; i < numSamples; i++) {
     const t = i / SAMPLE_RATE;
 
-    // Low transient "thump"
-    const thump = Math.sin(2 * Math.PI * 90 * t) * Math.exp(-t * 35);
+    // Descending chirp: bubble expands → lower resonant frequency
+    const freq = 60 + 290 * Math.exp(-t * 20);
 
-    // High-frequency noise spray
-    const noise = rand() * Math.exp(-t * 50);
+    // 3 ms near-instant attack, exponential decay
+    const amp = Math.min(1.0, t / 0.003) * Math.exp(-t * 14);
 
-    // Small tonal "ping" from the membrane
-    const ping  = Math.sin(2 * Math.PI * 520 * t) * Math.exp(-t * 80);
+    // Pure sine with a tiny second harmonic for slight liquid "wetness"
+    phase += (2 * Math.PI * freq) / SAMPLE_RATE;
+    const s = Math.sin(phase) * 0.92 + Math.sin(2 * phase) * 0.08;
 
-    const s = thump * 0.55 + noise * 0.30 + ping * 0.15;
-    samples.push(s * 28000);
+    samples.push(amp * s * 28000);
   }
   return samples;
 }

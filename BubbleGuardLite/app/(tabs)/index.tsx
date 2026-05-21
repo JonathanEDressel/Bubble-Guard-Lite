@@ -21,7 +21,7 @@ export default function BubbleScreen() {
   const canvasCy = canvasH / 2;
 
   const { writeSessionEnd } = useBestScore();
-  const { playGrow, playPop } = useSound();
+  const { playGrow, playPop, isMuted, toggleMute } = useSound();
 
   const handleSpawn = useCallback(() => {
     playGrow();
@@ -55,7 +55,7 @@ export default function BubbleScreen() {
       </View>
       <View style={styles.canvas}>
         <BubbleCanvas />
-        <BubbleCount />
+        <BubbleCount isMuted={isMuted} onToggleMute={toggleMute} />
       </View>
     </View>
   );
@@ -64,7 +64,7 @@ export default function BubbleScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#EBF5FF',
   },
   canvas: {
     flex: 1,

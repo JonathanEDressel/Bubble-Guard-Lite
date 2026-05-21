@@ -1,9 +1,25 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Audio } from 'expo-av';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ASYNC_KEYS } from '@/constants/config';
 
 export function useSound() {
   const growRef = useRef<Audio.Sound | null>(null);
   const popRef = useRef<Audio.Sound | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const mutedRef = useRef(false);
+
+  // Load persisted mute preference
+  useEffect(() => {
+    AsyncStorage.getItem(ASYNC_KEYS.IS_MUTED)
+      .then((val) => {
+        if (val === 'true') {
+          mutedRef.current = true;
+          setIsMuted(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -48,7 +64,15 @@ export function useSound() {
     };
   }, []);
 
+  const toggleMute = useCallback(async () => {
+    const next = !mutedRef.current;
+    mutedRef.current = next;
+    setIsMuted(next);
+    await AsyncStorage.setItem(ASYNC_KEYS.IS_MUTED, next ? 'true' : 'false');
+  }, []);
+
   async function playGrow() {
+    if (mutedRef.current) return;
     try {
       await growRef.current?.replayAsync();
     } catch {
@@ -57,6 +81,7 @@ export function useSound() {
   }
 
   async function playPop() {
+    if (mutedRef.current) return;
     try {
       await popRef.current?.replayAsync();
     } catch {
@@ -64,5 +89,5 @@ export function useSound() {
     }
   }
 
-  return { playGrow, playPop };
+  return { playGrow, playPop, isMuted, toggleMute };
 }

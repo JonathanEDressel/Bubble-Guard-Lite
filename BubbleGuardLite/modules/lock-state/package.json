@@ -1,0 +1,7 @@
+{
+  "name": "lock-state",
+  "version": "1.0.0",
+  "description": "iOS lock-state detection module for BubbleGuardLite",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}

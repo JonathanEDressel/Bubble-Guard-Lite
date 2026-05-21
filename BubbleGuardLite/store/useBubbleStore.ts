@@ -34,6 +34,7 @@ export const useBubbleStore = create<BubbleState>((set, get) => ({
       const id = s.nextId;
       const newBubbles = [...s.bubbles, { ...bubble, id }];
       const newCount = newBubbles.length;
+      console.log(`[BubbleGuard] +1 bubble added   | total: ${newCount}`);
       return {
         bubbles: newBubbles,
         nextId: id + 1,
@@ -47,6 +48,8 @@ export const useBubbleStore = create<BubbleState>((set, get) => ({
     if (bubbles.length === 0) return null;
     const oldest = bubbles.reduce((a, b) => (a.id < b.id ? a : b));
     set((s) => ({ bubbles: s.bubbles.filter((b) => b.id !== oldest.id) }));
+    const remainingCount = bubbles.length - 1;
+    console.log(`[BubbleGuard] -1 bubble removed  | total: ${remainingCount}`);
     return oldest;
   },
 

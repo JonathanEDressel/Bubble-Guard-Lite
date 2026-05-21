@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 
+import { BannerAd } from '@/components/BannerAd';
 import { useBestScore, StoredStats } from '@/hooks/useBestScore';
 import { useBubbleStore } from '@/store/useBubbleStore';
 
@@ -78,13 +79,17 @@ export default function StatsScreen() {
   const displayBest = Math.max(stats.allTimeBest, storeAllTimeBest);
 
   return (
-    <ScrollView
-      style={styles.root}
-      contentContainerStyle={[
-        styles.content,
-        { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 },
-      ]}
-    >
+    <View style={styles.root}>
+      <View style={{ paddingTop: insets.top }}>
+        <BannerAd />
+      </View>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: 24, paddingBottom: insets.bottom + 24 },
+        ]}
+      >
       <Text style={styles.heading}>Stats</Text>
 
       <View style={styles.card}>
@@ -102,7 +107,8 @@ export default function StatsScreen() {
       <TouchableOpacity style={styles.resetBtn} onPress={confirmReset} activeOpacity={0.7}>
         <Text style={styles.resetText}>Clear All Data</Text>
       </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -128,7 +134,10 @@ function StatRow({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#f5f9ff',
+    backgroundColor: '#EBF5FF',
+  },
+  scroll: {
+    flex: 1,
   },
   content: {
     paddingHorizontal: 20,
@@ -136,7 +145,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1a1a2e',
+    color: '#1E2A3A',
     marginBottom: 20,
   },
   card: {
@@ -164,16 +173,16 @@ const styles = StyleSheet.create({
   },
   rowLabel: {
     fontSize: 15,
-    color: '#555',
+    color: '#475569',
   },
   rowValue: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#1a1a2e',
+    color: '#1E2A3A',
   },
   rowValueLarge: {
     fontSize: 28,
-    color: '#64B4FF',
+    color: '#1a87c7',
   },
   resetBtn: {
     alignSelf: 'center',

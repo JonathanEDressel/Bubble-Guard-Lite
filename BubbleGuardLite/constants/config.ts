@@ -24,4 +24,6 @@ export const ASYNC_KEYS = {
   LAST_SESSION_DATE: '@bubbleguard/last_session_date',
   TOTAL_SESSIONS: '@bubbleguard/total_sessions',
   TOTAL_FOCUS_MINS: '@bubbleguard/total_focus_mins',
+  HAS_SEEN_ONBOARDING: '@bubbleguard/has_seen_onboarding',
+  IS_MUTED: '@bubbleguard/is_muted',
 } as const;
